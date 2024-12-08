@@ -3,35 +3,13 @@
 #include "ClapTrap.hpp"
 
 int main() {
-	ClapTrap trap("Bob");
-	std::cout << "\n";
-	trap.hit_points(3);
-	trap.energy_points(3);
-	trap.attack_damage(2);
-	std::cout << trap << "\n\n";
+	ClapTrap bob("Bob");
 	trap.attack("Sara");
-	std::cout << trap << "\n\n";
-	trap.takeDamage(1);
-	std::cout << trap << "\n\n";
-	trap.beRepaired(1);
-	std::cout << trap << "\n\n";
-	trap.beRepaired(1);
-	std::cout << trap << "\n\n";
-	trap.beRepaired(1);
-	std::cout << trap << "\n\n";
-	trap.beRepaired(1);
-	std::cout << trap << "\n\n";
-	trap.takeDamage(1);
-	std::cout << trap << "\n\n";
-	trap.takeDamage(1);
-	std::cout << trap << "\n\n";
-	trap.takeDamage(1);
-	std::cout << trap << "\n\n";
-	trap.takeDamage(1);
-	std::cout << trap << "\n\n";
-	trap.takeDamage(1);
-	std::cout << trap << "\n\n";
-	trap.takeDamage(1);
-	std::cout << trap << "\n\n";
+	for (int i = 0; i < 2; ++i)
+		trap.takeDamage(3);
+	trap.beRepaired(10);
+	for (int i = 0; i < 7; ++i)
+		trap.takeDamage(3);
+	trap.beRepaired(10);
 	return 0;
 }

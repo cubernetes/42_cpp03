@@ -1,4 +1,4 @@
-// START: GENERATED
+// <GENERATED>
 #pragma once /* ClapTrap.hpp */
 
 #include <string> /* std::string */
@@ -11,6 +11,7 @@ using std::ostream;
 
 class ClapTrap {
 public:
+	// <generated>
 	~ClapTrap();
 	ClapTrap();
 	ClapTrap(const string&);
@@ -21,15 +22,16 @@ public:
 	string repr() const;
 	operator string() const;
 
-	const string& name() const;
-	unsigned int hit_points() const;
-	unsigned int energy_points() const;
-	unsigned int attack_damage() const;
+	const string& get_name() const;
+	unsigned int get_hit_points() const;
+	unsigned int get_energy_points() const;
+	unsigned int get_attack_damage() const;
 
-	void name(const string&);
-	void hit_points(unsigned int);
-	void energy_points(unsigned int);
-	void attack_damage(unsigned int);
+	void set_name(const string&);
+	void set_hit_points(unsigned int);
+	void set_energy_points(unsigned int);
+	void set_attack_damage(unsigned int);
+	// </generated>
 
 	void attack(const string&);
 	void takeDamage(unsigned int);
@@ -41,11 +43,11 @@ private:
 	unsigned int _attack_damage;
 };
 
-void swap(ClapTrap&, ClapTrap&) /* noexcept */;
-ostream& operator<<(ostream&, const ClapTrap&);
-
 template<>
 inline string repr(const ClapTrap& value) {
 	return value.repr();
 }
-// END: GENERATED
+
+void swap(ClapTrap&, ClapTrap&) /* noexcept */;
+ostream& operator<<(ostream&, const ClapTrap&);
+// </GENERATED>

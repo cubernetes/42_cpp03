@@ -1,4 +1,4 @@
-// START: GENERATED
+// <GENERATED>
 #pragma once /* repr.hpp */
 
 #include <sstream> /* std::ostringstream */
@@ -30,4 +30,4 @@ template <>
 inline string repr(const char& value) {
 	return string("'") + value + "'";
 }
-// END: GENERATED
+// </GENERATED>

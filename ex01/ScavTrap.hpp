@@ -1,4 +1,4 @@
-// START: GENERATED
+// <GENERATED>
 #pragma once /* ScavTrap.hpp */
 
 #include <string> /* std::string */
@@ -12,6 +12,7 @@ using std::ostream;
 
 class ScavTrap : public ClapTrap {
 public:
+	// <generated>
 	~ScavTrap();
 	ScavTrap();
 	ScavTrap(const string&);
@@ -20,17 +21,7 @@ public:
 	ScavTrap& operator=(ScavTrap);
 	void swap(ScavTrap&);
 	string repr() const;
-	operator string() const;
-
-	const string& name() const;
-	unsigned int hit_points() const;
-	unsigned int energy_points() const;
-	unsigned int attack_damage() const;
-
-	void name(const string&);
-	void hit_points(unsigned int);
-	void energy_points(unsigned int);
-	void attack_damage(unsigned int);
+	// </generated>
 
 	void attack(const string&);
 	void guardGate();
@@ -42,5 +33,4 @@ inline string repr(const ScavTrap& value) {
 }
 
 void swap(ScavTrap&, ScavTrap&) /* noexcept */;
-ostream& operator<<(ostream&, const ScavTrap&);
-// END: GENERATED
+// </GENERATED>
