@@ -1,3 +1,4 @@
+// START: GENERATED
 #include <iostream> /* std::cout, std::swap, std::ostream */
 #include <string> /* std::string */
 #include <sstream> /* std::stringstream */
@@ -15,7 +16,7 @@ ClapTrap::~ClapTrap() {
 	cout << "~ClapTrap()\n";
 }
 
-ClapTrap::ClapTrap() : _name("Anonymous"), _hit_points(10), _energy_points(10), _attack_damage(0) {
+ClapTrap::ClapTrap() : _name("Anonymous ClapTrap"), _hit_points(10), _energy_points(10), _attack_damage(0) {
 	cout << "ClapTrap()\n";
 }
 
@@ -64,10 +65,6 @@ string ClapTrap::repr() const {
 	return out.str();
 }
 
-string repr(const ClapTrap& value) {
-	return value.repr();
-}
-
 ClapTrap::operator string() const {
 	return ::repr(*this);
 }
@@ -75,26 +72,27 @@ ClapTrap::operator string() const {
 ostream& operator<<(ostream& os, const ClapTrap& other) {
 	return os << static_cast<string>(other);
 }
+// END: GENERATED
 
 void ClapTrap::attack(const string& target) {
 	if (_energy_points > 0) {
 		if (_hit_points > 0) {
-			cout << _name << " deals " << _attack_damage << " hit points damage to " << target << '\n';
+			cout << "ClapTrap " << _name << " deals " << _attack_damage << " hit points damage to " << target << '\n';
 			--_energy_points;
 		} else {
-			cout << _name << " has no hit points left to attack\n";
+			cout << "ClapTrap " << _name << " has no hit points left to attack\n";
 		}
 	} else {
-		cout << _name << " has no energy points left to attack\n";
+		cout << "ClapTrap " << _name << " has no energy points left to attack\n";
 	}
 }
 
 void ClapTrap::takeDamage(unsigned int amount) {
 	if (_hit_points <= 0) {
-		cout << "It's like beating a dead horse! " << _name << " is already dead!\n";
+		cout << "It's like beating a dead horse! " << "ClapTrap " << _name << " is already dead!\n";
 		return;
 	}
-	cout << _name << " takes " << amount << " hit points of damage\n";
+	cout << "ClapTrap " << _name << " takes " << amount << " hit points of damage\n";
 	if (amount >= _hit_points) {
 		cout << _name << " died!\n";
 		_hit_points = 0;
@@ -105,13 +103,13 @@ void ClapTrap::takeDamage(unsigned int amount) {
 void ClapTrap::beRepaired(unsigned int amount) {
 	if (_energy_points > 0) {
 		if (_hit_points > 0) {
-			cout << _name << " regenerates ('repairs') " << amount << " hit points\n";
+			cout << "ClapTrap " << _name << " regenerates ('repairs') " << amount << " hit points\n";
 			_hit_points += amount;
 			--_energy_points;
 		} else {
-			cout << _name << " has no hit points left to repair itself\n";
+			cout << "ClapTrap " << _name << " has no hit points left to repair itself\n";
 		}
 	} else {
-		cout << _name << " has no energy points left to repair itself\n";
+		cout << "ClapTrap " << _name << " has no energy points left to repair itself\n";
 	}
 }

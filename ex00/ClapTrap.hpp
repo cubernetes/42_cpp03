@@ -1,7 +1,10 @@
+// START: GENERATED
 #pragma once /* ClapTrap.hpp */
 
 #include <string> /* std::string */
 #include <iostream> /* std::ostream */
+
+#include "repr.hpp"
 
 using std::string;
 using std::ostream;
@@ -40,4 +43,9 @@ private:
 
 void swap(ClapTrap& a, ClapTrap& b) /* noexcept */;
 ostream& operator<<(ostream&, const ClapTrap&);
-string repr(const ClapTrap& value);
+
+template<>
+inline string repr(const ClapTrap& value) {
+	return value.repr();
+}
+// END: GENERATED
