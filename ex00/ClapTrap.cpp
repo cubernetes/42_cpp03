@@ -12,6 +12,7 @@ using std::string;
 using std::ostream;
 using std::stringstream;
 
+// De- & Constructors
 ClapTrap::~ClapTrap() { cout << "~ClapTrap()\n"; }
 ClapTrap::ClapTrap() : _name("Anonymous ClapTrap"), _hit_points(10), _energy_points(10), _attack_damage(0) { cout << "ClapTrap()\n"; }
 ClapTrap::ClapTrap(const string& name) : _name(name), _hit_points(10), _energy_points(10), _attack_damage(0) { cout << "ClapTrap(" << ::repr(name) << ")\n"; }

@@ -12,6 +12,7 @@ using std::string;
 using std::ostream;
 using std::stringstream;
 
+// De- & Constructors
 ScavTrap::~ScavTrap() { cout << "~ScavTrap()\n"; }
 ScavTrap::ScavTrap() : ClapTrap("Anonymous ScavTrap", 100, 50, 20) { cout << "ScavTrap()\n"; }
 ScavTrap::ScavTrap(const string& name) : ClapTrap(name, 100, 50, 20) { cout << "ScavTrap(" << ::repr(name) << ")\n"; }
