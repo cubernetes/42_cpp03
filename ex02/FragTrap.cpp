@@ -4,6 +4,7 @@
 #include <sstream> /* std::stringstream */
 
 #include "repr.hpp"
+#include "ClapTrap.hpp"
 #include "FragTrap.hpp"
 
 using std::cout;
@@ -14,9 +15,10 @@ using std::stringstream;
 
 // De- & Constructors
 FragTrap::~FragTrap() { cout << "~FragTrap()\n"; }
-FragTrap::FragTrap() : _name("Anonymous FragTrap"), _hit_points(100), _energy_points(100), _attack_damage(30) { cout << "FragTrap()\n"; }
-FragTrap::FragTrap(const string& name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : _name(name), _hit_points(hit_points), _energy_points(energy_points), _attack_damage(attack_damage) { cout << *this << '\n'; }
-FragTrap::FragTrap(const FragTrap& other) : _name(other._name), _hit_points(other._hit_points), _energy_points(other._energy_points), _attack_damage(other._attack_damage) { cout << "FragTrap(" << ::repr(other) << ")\n"; }
+FragTrap::FragTrap() : ClapTrap("Anonymous FragTrap", 100, 100, 30) { cout << "FragTrap()\n"; }
+FragTrap::FragTrap(const string& name) : ClapTrap(name, 100, 100, 30) { cout << "FragTrap(" << ::repr(name) << ")\n"; }
+FragTrap::FragTrap(const string& name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : ClapTrap(name, hit_points, energy_points, attack_damage) { cout << *this << '\n'; }
+FragTrap::FragTrap(const FragTrap& other) : ClapTrap(other) { cout << "FragTrap(" << ::repr(other) << ")\n"; }
 
 // Copy-assignment operator (using copy-swap idiom)
 FragTrap& FragTrap::operator=(FragTrap other) /* noexcept */ {

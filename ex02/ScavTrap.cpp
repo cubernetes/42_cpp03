@@ -4,6 +4,7 @@
 #include <sstream> /* std::stringstream */
 
 #include "repr.hpp"
+#include "ClapTrap.hpp"
 #include "ScavTrap.hpp"
 
 using std::cout;
