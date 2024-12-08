@@ -11,9 +11,10 @@ serializing_ctor_template = '''\
 }
 
 '''
-getter_template = '''const {{decl_type}}& {{class_name}}::{{identifier}}() const { return {{priv_identifier}}; }'''
-setter_template = '''void {{class_name}}::{{identifier}}(const {{decl_type}}& value) { {{priv_identifier}} = value; }'''
+getter_template = '''{{decl_type}} {{class_name}}::{{identifier}}() const { return {{priv_identifier}}; }'''
+setter_template = '''void {{class_name}}::{{identifier}}({{decl_type}} value) { {{priv_identifier}} = value; }'''
 occf_template = '''\
+// START: GENERATED
 #pragma once /* repr.hpp */
 
 #include <sstream> /* std::ostringstream */
@@ -45,10 +46,14 @@ template <>
 inline string repr(const char& value) {
 	return string("'") + value + "'";
 }
+// END: GENERATED
+// START: GENERATED
 #pragma once /* {{class_name}}.hpp */
 
 #include <string> /* std::string */
 #include <iostream> /* std::ostream */
+
+#include "repr.hpp" /* repr<T> */
 
 using std::string;
 using std::ostream;
@@ -65,12 +70,14 @@ public:
 {{private_member_decls}}};
 
 template <>
-string repr(const {{class_name}}& value) {
+inline string repr(const {{class_name}}& value) {
 	return value.repr();
 }
 
-void swap({{class_name}}& a, {{class_name}}& b) /* noexcept */;
+void swap({{class_name}}&, {{class_name}}&) /* noexcept */;
 ostream& operator<<(ostream&, const {{class_name}}&);
+// END: GENERATED
+// START: GENERATED
 #include <iostream> /* std::cout, std::swap, std::ostream */
 #include <string> /* std::string */
 #include <sstream> /* std::stringstream */
@@ -93,11 +100,11 @@ using std::stringstream;
 }
 
 {{serializing_ctor}}{{class_name}}::{{class_name}}(const {{class_name}}& {{instance_other}}){{member_init_list_copy_ctor}} {
-	cout << "{{class_name}}(const {{class_name}}& {{instance_other}})\\n";
+	cout << "{{class_name}}(" << ::repr({{instance_other}}) << ")\\n";
 }
 
 {{class_name}}& {{class_name}}::operator=({{class_name}} {{instance_other}}) /* noexcept */ {
-	cout << "{{class_name}}& {{class_name}}::operator=({{class_name}} {{instance_other}})\\n";
+	cout << "{{class_name}}& {{class_name}}::operator=(" << ::repr({{instance_other}}) << ")\\n";
 	::swap(*this, {{instance_other}});
 	return *this;
 }
@@ -120,25 +127,129 @@ string {{class_name}}::repr() const {
 
 ostream& operator<<(ostream& os, const {{class_name}}& {{instance_other}}) {
 	return os << static_cast<string>({{instance_other}});
-}'''
+}
+// END: GENERATED'''
+
+fundamental_types = [
+
+]
 
 def make_private(s: str) -> str:
     return '_' + s
 
-def gen_private_member_decls(decls: list[tuple[str, str, str]]) -> str:
+def remove_cv_qualification(words: list[str]) -> list[str]:
+    new_words = words[:]
+    has_v = False
+    has_c = False
+    while True:
+        if new_words[0] == 'volatile':
+            if has_v:
+                return []
+            new_words.pop(0)
+            has_v = True
+            continue
+        elif new_words[0] == 'const':
+            if has_c:
+                return []
+            new_words.pop(0)
+            has_c = True
+            continue
+        break
+    return new_words
+
+
+# see https://en.cppreference.com/w/cpp/language/types
+def is_fundamental_type(s: str) -> bool:
+    words = s.strip().split()
+    if not words:
+        return False
+    words = remove_cv_qualification(words) # what about the mutable keyword??
+    if not words:
+        return False
+    if len(words) == 1 and words[0] in [
+        'bool',
+        'float',
+        'double',
+        'char',
+        'size_t',
+        'ssize_t',
+        'ptrdiff_t',
+        'nullptr_t',
+        'wchar_t',
+        'wctrans_t',
+        'wctype_t',
+        'wint_t',
+        'wctrans_t',
+        'char8_t',
+        'char16_t',
+        'char32_t',
+        'int8_t',
+        'int16_t',
+        'int32_t',
+        'int64_t',
+        'int_fast8_t',
+        'int_fast16_t',
+        'int_fast32_t',
+        'int_fast64_t',
+        'int_least8_t',
+        'int_least16_t',
+        'int_least32_t',
+        'int_least64_t',
+        'intmax_t',
+        'intptr_t',
+        'uint8_t',
+        'uint16_t',
+        'uint32_t',
+        'uint64_t',
+        'uint_fast32_t',
+        'uint_fast64_t',
+        'uint_least8_t',
+        'uint_least16_t',
+        'uint_least32_t',
+        'uint_least64_t',
+        'uintmax_t',
+        'uintptr_t',
+    ]:
+        return True
+    elif len(words) == 2 and \
+            words == ['long', 'double'] or \
+            words == ['signed', 'char'] or \
+            words == ['char', 'signed'] or \
+            words == ['unsigned', 'char'] or \
+            words == ['char', 'unsigned'] or \
+        False:
+        return True
+    if words.count('signed') > 1:
+        return False
+    if words.count('unsigned') > 1:
+        return False
+    if words.count('short') > 1:
+        return False
+    if words.count('long') > 2:
+        return False
+    if 'short' in words and 'long' in words:
+        return False
+    if 'signed' in words and 'unsigned' in words:
+        return False
+    without_modifiers = [word for word in words if word not in ['signed', 'unsigned', 'short', 'long']]
+    if not without_modifiers:
+        return True
+    return len(without_modifiers) == 1 and without_modifiers[0] == 'int'
+
+def gen_private_member_decls(decls: list[tuple[str, str, str, bool]]) -> str:
     result = 'private:\n'
     for decl in decls:
-        decl_type, identifier, default_value = decl
+        decl_type, identifier, _, _ = decl
         identifier = make_private(identifier)
         result += f'\t{decl_type} {identifier};\n'
     if result == 'private:\n':
         return ''
     return result
 
-def gen_private_member_copy_assigns(decls: list[tuple[str, str, str]]) -> str:
+def gen_private_member_copy_assigns(decls: list[tuple[str, str, str, bool]]) -> str:
     result = '\tif \x28this == &{{instance_other}}) \x7b\n'
     for decl in decls:
-        _, identifier, _ = decl
+        _, identifier, _, _ = decl
         identifier = make_private(identifier)
         result += f'\t\t{identifier} = {other_identifier}.{identifier};\n'
     if result == '\tif \x28this == &{{instance_other}}) \x7b\n':
@@ -146,10 +257,10 @@ def gen_private_member_copy_assigns(decls: list[tuple[str, str, str]]) -> str:
     result += '\t}\n\t'
     return result
 
-def gen_private_member_init_list(decls: list[tuple[str, str, str]]) -> str:
+def gen_private_member_init_list(decls: list[tuple[str, str, str, bool]]) -> str:
     inits = []
     for decl in decls:
-        _, identifier, default_value = decl
+        _, identifier, default_value, _ = decl
         identifier = make_private(identifier)
         if default_value:
             inits.append(f'{identifier}({default_value})')
@@ -159,10 +270,10 @@ def gen_private_member_init_list(decls: list[tuple[str, str, str]]) -> str:
         return ''
     return ' : ' + ', '.join(inits)
 
-def gen_private_member_init_list_copy_ctor(decls: list[tuple[str, str, str]]) -> str:
+def gen_private_member_init_list_copy_ctor(decls: list[tuple[str, str, str, bool]]) -> str:
     inits = []
     for decl in decls:
-        _, identifier, default_value = decl
+        _, identifier, default_value, _ = decl
         identifier = make_private(identifier)
         if default_value:
             inits.append(f'{identifier}({other_identifier}.{identifier})')
@@ -172,65 +283,84 @@ def gen_private_member_init_list_copy_ctor(decls: list[tuple[str, str, str]]) ->
         return ''
     return ' : ' + ', '.join(inits)
 
-def gen_swap_list(decls: list[tuple[str, str, str]]) -> str:
+def gen_swap_list(decls: list[tuple[str, str, str, bool]]) -> str:
     swaps = []
     for decl in decls:
-        _, identifier, _ = decl
+        _, identifier, _, _ = decl
         identifier = make_private(identifier)
         swaps.append(f'::swap({identifier}, {other_identifier}.{identifier});')
     if not swaps:
         return ''
     return '\n\t' + '\n\t'.join(swaps) + '\n'
 
-def gen_serialize_ctor_params(decls: list[tuple[str, str, str]]) -> str:
+def gen_serialize_ctor_params(decls: list[tuple[str, str, str, bool]]) -> str:
     params = []
     for decl in decls:
-        decl_type, identifier, _ = decl
-        params.append(f'{decl_type} {identifier}')
+        decl_type, identifier, _, is_fundamental = decl
+        if is_fundamental:
+            params.append(f'{decl_type} {identifier}')
+        else:
+            params.append(f'const {decl_type}& {identifier}')
     return ', '.join(params)
 
-def gen_member_init_list_serialize_ctor(decls: list[tuple[str, str, str]]) -> str:
+def gen_serialize_ctor_params_no_names(decls: list[tuple[str, str, str, bool]]) -> str:
+    params = []
+    for decl in decls:
+        decl_type, _, _, _ = decl
+        if is_fundamental_type(decl_type):
+            params.append(f'{decl_type}')
+        else:
+            params.append(f'const {decl_type}&')
+    return ', '.join(params)
+
+def gen_member_init_list_serialize_ctor(decls: list[tuple[str, str, str, bool]]) -> str:
     inits = []
     for decl in decls:
-        _, identifier, _ = decl
+        _, identifier, _, _ = decl
         priv_identifier = make_private(identifier)
         inits.append(f'{priv_identifier}({identifier})')
     if not inits:
         return ''
     return ' : ' + ', '.join(inits)
 
-def gen_serializer_pack(decls: list[tuple[str, str, str]]) -> str:
+def gen_serializer_pack(decls: list[tuple[str, str, str, bool]]) -> str:
     pack = []
     for decl in decls:
-        _, identifier, _ = decl
+        _, identifier, _, _ = decl
         identifier = make_private(identifier)
         pack.append(f' << ::repr({identifier}) << ')
     if not pack:
         return ''
     return '", "'.join(pack)
 
-def gen_getter_decls(class_name: str, decls: list[tuple[str, str, str]]) -> str:
+def gen_getter_decls(decls: list[tuple[str, str, str, bool]]) -> str:
     pack = []
     for decl in decls:
-        decl_type, identifier, _ = decl
+        decl_type, identifier, _, is_fundamental = decl
         priv_identifier = make_private(identifier)
-        getter = getter_template.replace('{{decl_type}}', decl_type)
+        if is_fundamental:
+            getter = getter_template.replace('{{decl_type}}', f'{decl_type}')
+        else:
+            getter = getter_template.replace('{{decl_type}}', f'const {decl_type}&')
         getter = getter.replace('{{class_name}}::', '')
         getter = getter.replace('{{identifier}}', identifier)
         getter = getter.replace('{{priv_identifier}}', priv_identifier)
-        getter = re.sub(r'\(\) const \{ .*', r'() const;', getter)
+        getter = re.sub('\\(\\) const \\\x7b .*', r'() const;', getter)
         pack.append(f'\n\t{getter}')
     if not pack:
         return ''
     return '\n' + ''.join(pack)
 
-def gen_getters(class_name: str, decls: list[tuple[str, str, str]]) -> str:
+def gen_getters(class_name: str, decls: list[tuple[str, str, str, bool]]) -> str:
     pack = []
     for decl in decls:
-        decl_type, identifier, _ = decl
+        decl_type, identifier, _, is_fundamental = decl
         priv_identifier = make_private(identifier)
-        getter = getter_template.replace('{{class_name}}', class_name)
-        getter = getter.replace('{{decl_type}}', decl_type)
+        if is_fundamental:
+            getter = getter_template.replace('{{decl_type}}', f'{decl_type}')
+        else:
+            getter = getter_template.replace('{{decl_type}}', f'const {decl_type}&')
+        getter = getter.replace('{{class_name}}', class_name)
         getter = getter.replace('{{identifier}}', identifier)
         getter = getter.replace('{{priv_identifier}}', priv_identifier)
         pack.append(f'\n{getter}')
@@ -238,28 +368,34 @@ def gen_getters(class_name: str, decls: list[tuple[str, str, str]]) -> str:
         return ''
     return ''.join(pack)
 
-def gen_setter_decls(class_name: str, decls: list[tuple[str, str, str]]) -> str:
+def gen_setter_decls(decls: list[tuple[str, str, str, bool]]) -> str:
     pack = []
     for decl in decls:
-        decl_type, identifier, _ = decl
+        decl_type, identifier, _, is_fundamental = decl
         priv_identifier = make_private(identifier)
-        setter = setter_template.replace('{{decl_type}}', decl_type)
+        if is_fundamental:
+            setter = setter_template.replace('{{decl_type}}', f'{decl_type}')
+        else:
+            setter = setter_template.replace('{{decl_type}}', f'const {decl_type}&')
         setter = setter.replace('{{class_name}}::', '')
         setter = setter.replace('{{identifier}}', identifier)
         setter = setter.replace('{{priv_identifier}}', priv_identifier)
-        setter = re.sub(r'& value\) \{ .*', r'&);', setter)
+        setter = re.sub(' value\\) \\\x7b .*', r');', setter)
         pack.append(f'\n\t{setter}')
     if not pack:
         return ''
     return '\n' + ''.join(pack)
 
-def gen_setters(class_name: str, decls: list[tuple[str, str, str]]) -> str:
+def gen_setters(class_name: str, decls: list[tuple[str, str, str, bool]]) -> str:
     pack = []
     for decl in decls:
-        decl_type, identifier, _ = decl
+        decl_type, identifier, _, is_fundamental = decl
         priv_identifier = make_private(identifier)
-        setter = setter_template.replace('{{class_name}}', class_name)
-        setter = setter.replace('{{decl_type}}', decl_type)
+        if is_fundamental:
+            setter = setter_template.replace('{{decl_type}}', f'{decl_type}')
+        else:
+            setter = setter_template.replace('{{decl_type}}', f'const {decl_type}&')
+        setter = setter.replace('{{class_name}}', class_name)
         setter = setter.replace('{{identifier}}', identifier)
         setter = setter.replace('{{priv_identifier}}', priv_identifier)
         pack.append(f'\n{setter}')
@@ -267,7 +403,7 @@ def gen_setters(class_name: str, decls: list[tuple[str, str, str]]) -> str:
         return ''
     return '\n' + ''.join(pack) + '\n'
 
-def gen_serializing_ctor(decls: list[tuple[str, str, str]]) -> str:
+def gen_serializing_ctor(decls: list[tuple[str, str, str, bool]]) -> str:
     if not decls:
         return ''
     result = serializing_ctor_template.replace('{{serialize_ctor_params}}', gen_serialize_ctor_params(decls))
@@ -278,17 +414,17 @@ def gen_serializing_ctor(decls: list[tuple[str, str, str]]) -> str:
         result = result.replace('{{opt_explicit_specifier}}', '')
     return result
 
-def gen_serializing_ctor_decl(decls: list[tuple[str, str, str]]) -> str:
+def gen_serializing_ctor_decl(decls: list[tuple[str, str, str, bool]]) -> str:
     if not decls:
         return ''
-    result = serializing_ctor_decl_template.replace('{{serialize_ctor_params}}', gen_serialize_ctor_params(decls))
+    result = serializing_ctor_decl_template.replace('{{serialize_ctor_params}}', gen_serialize_ctor_params_no_names(decls))
     if len(decls) == 1:
         result = result.replace('{{opt_explicit_specifier}}', 'explicit ')
     else:
         result = result.replace('{{opt_explicit_specifier}}', '')
     return '\n\t' + result
 
-def gen_occf(class_name: str, decls: list[tuple[str, str, str]]) -> str:
+def gen_occf(class_name: str, decls: list[tuple[str, str, str, bool]]) -> str:
     result = occf_template.replace('{{serializing_ctor}}', gen_serializing_ctor(decls))
     result = result.replace('{{serializing_ctor_decl}}', gen_serializing_ctor_decl(decls))
     result = result.replace('{{class_name}}', class_name)
@@ -298,8 +434,8 @@ def gen_occf(class_name: str, decls: list[tuple[str, str, str]]) -> str:
     result = result.replace('{{member_init_list_copy_ctor}}', gen_private_member_init_list_copy_ctor(decls))
     result = result.replace('{{swap_list}}', gen_swap_list(decls))
     result = result.replace('{{serializer_pack}}', gen_serializer_pack(decls))
-    result = result.replace('{{getter_decls}}', gen_getter_decls(class_name, decls))
-    result = result.replace('{{setter_decls}}', gen_setter_decls(class_name, decls))
+    result = result.replace('{{getter_decls}}', gen_getter_decls(decls))
+    result = result.replace('{{setter_decls}}', gen_setter_decls(decls))
     result = result.replace('{{getters}}', gen_getters(class_name, decls))
     result = result.replace('{{setters}}', gen_setters(class_name, decls))
     result = result.replace('{{instance_other}}', f'{other_identifier}')
@@ -310,16 +446,16 @@ def parse_class_name(s: str) -> str:
         return m[0]
     return ''
 
-def parse_decl(s: str) -> tuple[str, str, str]:
+def parse_decl(s: str) -> tuple[str, str, str, bool]:
     # examples: std::string Bla_123 "hello"
     #           int i
     #           ::mystr __h1iegh
     m = re.match(r'^((?:(?:(?:[a-zA-Z_][a-zA-Z_0-9]*)?::)?[a-zA-Z_][a-zA-Z_0-9]*)|(?:[a-zA-Z_][a-zA-Z_0-9]*(?:\s+[a-zA-Z_][a-zA-Z_0-9]*){,3}))(?:\s+)([a-zA-Z_][a-zA-Z_0-9]*)(?:\s+((?:[0-9]+)|(?:"[^"]*")))?$', s)
     if not m:
-        return '', '', ''
-    return m[1], m[2], m[3]
+        return '', '', '', False
+    return m[1], m[2], m[3], is_fundamental_type(m[1])
 
-def parse_decls(decls: list[str]) -> list[tuple[str, str, str]]:
+def parse_decls(decls: list[str]) -> list[tuple[str, str, str, bool]]:
     parsed_decls = []
     for decl in decls:
         parsed_decl = parse_decl(decl)
@@ -327,7 +463,7 @@ def parse_decls(decls: list[str]) -> list[tuple[str, str, str]]:
             return []
         parsed_decls.append(parsed_decl)
     if not parsed_decls:
-        return [('','','')]
+        return [('','','',False)]
     return parsed_decls
 
 if __name__ == '__main__':
