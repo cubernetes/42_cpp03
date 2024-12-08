@@ -38,9 +38,11 @@ void ScavTrap::swap(ScavTrap& other) /* noexcept */ {
 	::swap(_energy_points, other._energy_points);
 	::swap(_attack_damage, other._attack_damage);
 }
+ScavTrap::operator string() const { return ::repr(*this); }
 
 // Generated free functions
 void swap(ScavTrap& a, ScavTrap& b) /* noexcept */ { a.swap(b); }
+ostream& operator<<(ostream& os, const ScavTrap& other) { return os << static_cast<string>(other); }
 // </GENERATED>
 
 void ScavTrap::attack(const string& target) {

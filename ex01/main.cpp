@@ -12,5 +12,6 @@ int main() {
 	bob.beRepaired(3);
 	for (int i = 0; i < 10; ++i)
 		bob.takeDamage(15);
+	std::cout << bob << '\n';
 	return 0;
 }

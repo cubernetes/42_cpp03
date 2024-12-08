@@ -21,6 +21,7 @@ public:
 	ScavTrap& operator=(ScavTrap);
 	void swap(ScavTrap&);
 	string repr() const;
+	operator string() const;
 	// </generated>
 
 	void attack(const string&);
@@ -33,4 +34,5 @@ inline string repr(const ScavTrap& value) {
 }
 
 void swap(ScavTrap&, ScavTrap&) /* noexcept */;
+ostream& operator<<(ostream& os, const ScavTrap& other);
 // </GENERATED>
