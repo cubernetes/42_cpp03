@@ -6,15 +6,12 @@ import sys
 other_identifier = 'other'
 serializing_ctor_decl_template = '''{{opt_explicit_specifier}}{{class_name}}({{serialize_ctor_params}});'''
 serializing_ctor_template = '''\
-{{class_name}}::{{class_name}}({{serialize_ctor_params}}){{member_init_list_serialize_ctor}} {
-	cout << *this << '\\n';
-}
-
+{{class_name}}::{{class_name}}({{serialize_ctor_params}}){{member_init_list_serialize_ctor}} { cout << *this << '\\n'; }
 '''
-getter_template = '''{{decl_type}} {{class_name}}::{{identifier}}() const { return {{priv_identifier}}; }'''
-setter_template = '''void {{class_name}}::{{identifier}}({{decl_type}} value) { {{priv_identifier}} = value; }'''
+getter_template = '''{{decl_type}} {{class_name}}::get_{{identifier}}() const { return {{priv_identifier}}; }'''
+setter_template = '''void {{class_name}}::set_{{identifier}}({{decl_type}} value) { {{priv_identifier}} = value; }'''
 occf_template = '''\
-// START: GENERATED
+// <GENERATED>
 #pragma once /* repr.hpp */
 
 #include <sstream> /* std::ostringstream */
@@ -46,8 +43,8 @@ template <>
 inline string repr(const char& value) {
 	return string("'") + value + "'";
 }
-// END: GENERATED
-// START: GENERATED
+// </GENERATED>
+// <GENERATED>
 #pragma once /* {{class_name}}.hpp */
 
 #include <string> /* std::string */
@@ -60,6 +57,7 @@ using std::ostream;
 
 class {{class_name}} {
 public:
+	// <generated>
 	~{{class_name}}();
 	{{class_name}}();{{serializing_ctor_decl}}
 	{{class_name}}(const {{class_name}}&);
@@ -67,6 +65,7 @@ public:
 	void swap({{class_name}}&);
 	string repr() const;
 	operator string() const;{{getter_decls}}{{setter_decls}}
+	// </generated>
 {{private_member_decls}}};
 
 template <>
@@ -76,8 +75,8 @@ inline string repr(const {{class_name}}& value) {
 
 void swap({{class_name}}&, {{class_name}}&) /* noexcept */;
 ostream& operator<<(ostream&, const {{class_name}}&);
-// END: GENERATED
-// START: GENERATED
+// </GENERATED>
+// <GENERATED>
 #include <iostream> /* std::cout, std::swap, std::ostream */
 #include <string> /* std::string */
 #include <sstream> /* std::stringstream */
@@ -91,44 +90,31 @@ using std::string;
 using std::ostream;
 using std::stringstream;
 
-{{class_name}}::~{{class_name}}() {
-	cout << "~{{class_name}}()\\n";
-}
+{{class_name}}::~{{class_name}}() { cout << "~{{class_name}}()\\n"; }
+{{class_name}}::{{class_name}}(){{member_init_list}} { cout << "{{class_name}}()\\n"; }
+{{serializing_ctor}}{{class_name}}::{{class_name}}(const {{class_name}}& {{instance_other}}){{member_init_list_copy_ctor}} { cout << "{{class_name}}(" << ::repr({{instance_other}}) << ")\\n"; }
 
-{{class_name}}::{{class_name}}(){{member_init_list}} {
-	cout << "{{class_name}}()\\n";
-}
-
-{{serializing_ctor}}{{class_name}}::{{class_name}}(const {{class_name}}& {{instance_other}}){{member_init_list_copy_ctor}} {
-	cout << "{{class_name}}(" << ::repr({{instance_other}}) << ")\\n";
-}
-
+// Copy-assignment operator (using copy-swap idiom)
 {{class_name}}& {{class_name}}::operator=({{class_name}} {{instance_other}}) /* noexcept */ {
 	cout << "{{class_name}}& {{class_name}}::operator=(" << ::repr({{instance_other}}) << ")\\n";
 	::swap(*this, {{instance_other}});
 	return *this;
 }
 
-void swap({{class_name}}& a, {{class_name}}& b) /* noexcept */ {
-	a.swap(b);
-}
-
-void {{class_name}}::swap({{class_name}}& {{instance_other}}) /* noexcept */ {{{swap_list}}}
 {{getters}}{{setters}}
+// Generated member functions
 string {{class_name}}::repr() const {
 	stringstream out;
 	out << "{{class_name}}("{{serializer_pack}}")";
 	return out.str();
 }
+void {{class_name}}::swap({{class_name}}& {{instance_other}}) /* noexcept */ {{{swap_list}}}
+{{class_name}}::operator string() const { return ::repr(*this); }
 
-{{class_name}}::operator string() const {
-	return ::repr(*this);
-}
-
-ostream& operator<<(ostream& os, const {{class_name}}& {{instance_other}}) {
-	return os << static_cast<string>({{instance_other}});
-}
-// END: GENERATED'''
+// Generated free functions
+void swap({{class_name}}& a, {{class_name}}& b) /* noexcept */ { a.swap(b); }
+ostream& operator<<(ostream& os, const {{class_name}}& {{instance_other}}) { return os << static_cast<string>({{instance_other}}); }
+// </GENERATED>'''
 
 fundamental_types = [
 
@@ -366,7 +352,7 @@ def gen_getters(class_name: str, decls: list[tuple[str, str, str, bool]]) -> str
         pack.append(f'\n{getter}')
     if not pack:
         return ''
-    return ''.join(pack)
+    return '// Generated getters' + ''.join(pack)
 
 def gen_setter_decls(decls: list[tuple[str, str, str, bool]]) -> str:
     pack = []
@@ -401,7 +387,7 @@ def gen_setters(class_name: str, decls: list[tuple[str, str, str, bool]]) -> str
         pack.append(f'\n{setter}')
     if not pack:
         return ''
-    return '\n' + ''.join(pack) + '\n'
+    return '\n\n// Generated setters' + ''.join(pack) + '\n'
 
 def gen_serializing_ctor(decls: list[tuple[str, str, str, bool]]) -> str:
     if not decls:
