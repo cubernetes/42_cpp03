@@ -16,20 +16,24 @@ ScavTrap::~ScavTrap() {
 	cout << "~ScavTrap()\n";
 }
 
-ScavTrap::ScavTrap() : _name("Anonymous ScavTrap"), _hit_points(100), _energy_points(50), _attack_damage(20) {
+ScavTrap::ScavTrap() : ClapTrap("Anonymous ScavTrap", 100, 50, 20) {
 	cout << "ScavTrap()\n";
 }
 
-ScavTrap::ScavTrap(std::string name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : _name(name), _hit_points(hit_points), _energy_points(energy_points), _attack_damage(attack_damage) {
+ScavTrap::ScavTrap(const string& name) : ClapTrap(name, 100, 50, 20) {
+	cout << "ScavTrap(" << ::repr(name) << ")\n";
+}
+
+ScavTrap::ScavTrap(const string& name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : ClapTrap(name, hit_points, energy_points, attack_damage) {
 	cout << *this << '\n';
 }
 
-ScavTrap::ScavTrap(const ScavTrap& other) : _name(other._name), _hit_points(other._hit_points), _energy_points(other._energy_points), _attack_damage(other._attack_damage) {
-	cout << "ScavTrap(const ScavTrap& other)\n";
+ScavTrap::ScavTrap(const ScavTrap& other) : ClapTrap(other) {
+	cout << "ScavTrap(" << ::repr(other) << ")\n";
 }
 
 ScavTrap& ScavTrap::operator=(ScavTrap other) /* noexcept */ {
-	cout << "ScavTrap& ScavTrap::operator=(ScavTrap other)\n";
+	cout << "ScavTrap& ScavTrap::operator=(" << ::repr(other) << ")\n";
 	::swap(*this, other);
 	return *this;
 }
@@ -45,15 +49,15 @@ void ScavTrap::swap(ScavTrap& other) /* noexcept */ {
 	::swap(_attack_damage, other._attack_damage);
 }
 
-const std::string& ScavTrap::name() const { return _name; }
-const unsigned int& ScavTrap::hit_points() const { return _hit_points; }
-const unsigned int& ScavTrap::energy_points() const { return _energy_points; }
-const unsigned int& ScavTrap::attack_damage() const { return _attack_damage; }
+const string& ScavTrap::name() const { return _name; }
+unsigned int ScavTrap::hit_points() const { return _hit_points; }
+unsigned int ScavTrap::energy_points() const { return _energy_points; }
+unsigned int ScavTrap::attack_damage() const { return _attack_damage; }
 
-void ScavTrap::name(const std::string& value) { _name = value; }
-void ScavTrap::hit_points(const unsigned int& value) { _hit_points = value; }
-void ScavTrap::energy_points(const unsigned int& value) { _energy_points = value; }
-void ScavTrap::attack_damage(const unsigned int& value) { _attack_damage = value; }
+void ScavTrap::name(const string& value) { _name = value; }
+void ScavTrap::hit_points(unsigned int value) { _hit_points = value; }
+void ScavTrap::energy_points(unsigned int value) { _energy_points = value; }
+void ScavTrap::attack_damage(unsigned int value) { _attack_damage = value; }
 
 string ScavTrap::repr() const {
 	stringstream out;
@@ -69,6 +73,11 @@ ostream& operator<<(ostream& os, const ScavTrap& other) {
 	return os << static_cast<string>(other);
 }
 // END: GENERATED
+
+
+
+
+
 
 void ScavTrap::attack(const string& target) {
 	if (_energy_points > 0) {

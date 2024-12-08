@@ -20,20 +20,20 @@ ClapTrap::ClapTrap() : _name("Anonymous ClapTrap"), _hit_points(10), _energy_poi
 	cout << "ClapTrap()\n";
 }
 
-ClapTrap::ClapTrap(string name) : _name(name), _hit_points(10), _energy_points(10), _attack_damage(0) {
+ClapTrap::ClapTrap(const string& name) : _name(name), _hit_points(10), _energy_points(10), _attack_damage(0) {
 	cout << "ClapTrap(" << ::repr(name) << ")\n";
 }
 
-ClapTrap::ClapTrap(string name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : _name(name), _hit_points(hit_points), _energy_points(energy_points), _attack_damage(attack_damage) {
+ClapTrap::ClapTrap(const string& name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : _name(name), _hit_points(hit_points), _energy_points(energy_points), _attack_damage(attack_damage) {
 	cout << *this << '\n';
 }
 
 ClapTrap::ClapTrap(const ClapTrap& other) : _name(other._name), _hit_points(other._hit_points), _energy_points(other._energy_points), _attack_damage(other._attack_damage) {
-	cout << "ClapTrap(const ClapTrap& other)\n";
+	cout << "ClapTrap(" << ::repr(other) << ")\n";
 }
 
 ClapTrap& ClapTrap::operator=(ClapTrap other) /* noexcept */ {
-	cout << "ClapTrap& ClapTrap::operator=(ClapTrap other)\n";
+	cout << "ClapTrap& ClapTrap::operator=(" << ::repr(other) << ")\n";
 	::swap(*this, other);
 	return *this;
 }
@@ -50,14 +50,14 @@ void ClapTrap::swap(ClapTrap& other) /* noexcept */ {
 }
 
 const string& ClapTrap::name() const { return _name; }
-const unsigned int& ClapTrap::hit_points() const { return _hit_points; }
-const unsigned int& ClapTrap::energy_points() const { return _energy_points; }
-const unsigned int& ClapTrap::attack_damage() const { return _attack_damage; }
+unsigned int ClapTrap::hit_points() const { return _hit_points; }
+unsigned int ClapTrap::energy_points() const { return _energy_points; }
+unsigned int ClapTrap::attack_damage() const { return _attack_damage; }
 
 void ClapTrap::name(const string& value) { _name = value; }
-void ClapTrap::hit_points(const unsigned int& value) { _hit_points = value; }
-void ClapTrap::energy_points(const unsigned int& value) { _energy_points = value; }
-void ClapTrap::attack_damage(const unsigned int& value) { _attack_damage = value; }
+void ClapTrap::hit_points(unsigned int value) { _hit_points = value; }
+void ClapTrap::energy_points(unsigned int value) { _energy_points = value; }
+void ClapTrap::attack_damage(unsigned int value) { _attack_damage = value; }
 
 string ClapTrap::repr() const {
 	stringstream out;
