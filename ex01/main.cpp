@@ -13,5 +13,7 @@ int main() {
 	for (int i = 0; i < 10; ++i)
 		bob.takeDamage(15);
 	std::cout << bob << '\n';
+	ClapTrap weirdo("Weirdo");
+	weirdo.attack("Alice");
 	return 0;
 }
