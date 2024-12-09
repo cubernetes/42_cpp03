@@ -13,7 +13,7 @@ using std::ostream;
 class ScavTrap : virtual public ClapTrap {
 public:
 	// <generated>
-	~ScavTrap();
+	virtual ~ScavTrap();
 	ScavTrap();
 	ScavTrap(const string&);
 	ScavTrap(const string&, unsigned int, unsigned int, unsigned int);

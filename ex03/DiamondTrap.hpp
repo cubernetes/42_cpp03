@@ -16,6 +16,7 @@ public:
 	// <generated>
 	~DiamondTrap();
 	DiamondTrap();
+	DiamondTrap(const string&);
 	DiamondTrap(const string&, unsigned int, unsigned int, unsigned int);
 	DiamondTrap(const DiamondTrap&);
 	DiamondTrap& operator=(DiamondTrap);

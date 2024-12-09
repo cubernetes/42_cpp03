@@ -13,7 +13,7 @@ using std::ostream;
 class FragTrap : virtual public ClapTrap {
 public:
 	// <generated>
-	~FragTrap();
+	virtual ~FragTrap();
 	FragTrap();
 	FragTrap(const string&);
 	FragTrap(const string&, unsigned int, unsigned int, unsigned int);

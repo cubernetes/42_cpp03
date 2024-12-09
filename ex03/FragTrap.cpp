@@ -57,14 +57,3 @@ void FragTrap::highFivesGuys() {
 		cout << "FragTrap " << _name << " has no energy points left to high-five, >:(((((\n";
 	}
 }
-void FragTrap::highFivesGuys() {
-	if (_energy_points > 0) {
-		if (_hit_points > 0) {
-			cout << "FragTrap " << _name << " GIVE A BIG HIGH FIVE!\n";
-		} else {
-			cout << "FragTrap " << _name << " has no hit points left to high-five, :'((((((\n";
-		}
-	} else {
-		cout << "FragTrap " << _name << " has no energy points left to high-five, >:(((((\n";
-	}
-}

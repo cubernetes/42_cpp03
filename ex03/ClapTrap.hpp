@@ -12,7 +12,7 @@ using std::ostream;
 class ClapTrap {
 public:
 	// <generated>
-	~ClapTrap();
+	virtual ~ClapTrap();
 	ClapTrap();
 	ClapTrap(const string&);
 	ClapTrap(const string&, unsigned int, unsigned int, unsigned int);

@@ -3,6 +3,7 @@
 #include "ClapTrap.hpp"
 #include "ScavTrap.hpp"
 #include "FragTrap.hpp"
+#include "DiamondTrap.hpp"
 
 int main() {
 	ScavTrap bob("Bob");
@@ -28,5 +29,12 @@ int main() {
 	ClapTrap weirdo("Weirdo");
 	weirdo.attack("Alice");
 	std::cout << "Weirdo's state: " << weirdo << "\n\n";
+
+	DiamondTrap dia("Dia");
+	dia.whoAmI();
+	ClapTrap *dia2 = new DiamondTrap("Dia2");
+	dia2->attack("something");
+	delete dia2;
+	std::cout << "Leaving scope of main\n";
 	return 0;
 }
