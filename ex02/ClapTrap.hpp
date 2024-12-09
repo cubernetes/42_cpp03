@@ -43,11 +43,7 @@ protected:
 	unsigned int _attack_damage;
 };
 
-template <>
-inline string repr(const ClapTrap& value) {
-	return value.repr();
-}
-
+template <> inline string repr(const ClapTrap& value) { return value.repr(); }
 void swap(ClapTrap&, ClapTrap&) /* noexcept */;
 ostream& operator<<(ostream&, const ClapTrap&);
 // </GENERATED>

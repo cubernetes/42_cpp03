@@ -28,11 +28,7 @@ public:
 	void guardGate();
 };
 
-template <>
-inline string repr(const ScavTrap& value) {
-	return value.repr();
-}
-
+template <> inline string repr(const ScavTrap& value) { return value.repr(); }
 void swap(ScavTrap&, ScavTrap&) /* noexcept */;
 ostream& operator<<(ostream& os, const ScavTrap& other);
 // </GENERATED>

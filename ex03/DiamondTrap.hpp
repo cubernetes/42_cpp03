@@ -31,11 +31,7 @@ private:
 	string _name;
 };
 
-template <>
-inline string repr(const DiamondTrap& value) {
-	return value.repr();
-}
-
+template <> inline string repr(const DiamondTrap& value) { return value.repr(); }
 void swap(DiamondTrap&, DiamondTrap&) /* noexcept */;
 ostream& operator<<(ostream&, const DiamondTrap&);
 // </GENERATED>

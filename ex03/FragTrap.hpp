@@ -27,11 +27,7 @@ public:
 	void highFivesGuys();
 };
 
-template <>
-inline string repr(const FragTrap& value) {
-	return value.repr();
-}
-
+template <> inline string repr(const FragTrap& value) { return value.repr(); }
 void swap(FragTrap&, FragTrap&) /* noexcept */;
 ostream& operator<<(ostream&, const FragTrap&);
 // </GENERATED>
