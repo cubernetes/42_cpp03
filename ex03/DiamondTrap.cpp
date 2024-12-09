@@ -17,9 +17,9 @@ using std::stringstream;
 
 // De- & Constructors
 DiamondTrap::~DiamondTrap() { cout << "~DiamondTrap()\n"; }
-DiamondTrap::DiamondTrap() : ClapTrap("Anonymous DiamondTrap_clap_name", 100, 50, 30), _name("Anonymous DiamondTrap") { cout << "DiamondTrap()\n"; }
-DiamondTrap::DiamondTrap(const string& name) : ClapTrap(name + "_clap_name", 100, 50, 30), _name(name) { cout << "DiamondTrap(" << ::repr(name) << ")\n"; }
-DiamondTrap::DiamondTrap(const string& name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : ClapTrap(name + "_clap_name", hit_points, energy_points, attack_damage), _name(name) { cout << *this << '\n'; }
+DiamondTrap::DiamondTrap() : ClapTrap("Anonymous DiamondTrap_clap_name", 100, 50, 30), /* FragTrap("Anonymous FragTrap"), ScavTrap("Anonymous ScavTrap"), */ _name("Anonymous DiamondTrap") { cout << "DiamondTrap()\n"; }
+DiamondTrap::DiamondTrap(const string& name) : ClapTrap(name + "_clap_name", 100, 50, 30), /* FragTrap(name), ScavTrap(name), */ _name(name) { cout << "DiamondTrap(" << ::repr(name) << ")\n"; }
+DiamondTrap::DiamondTrap(const string& name, unsigned int hit_points, unsigned int energy_points, unsigned int attack_damage) : ClapTrap(name + "_clap_name", hit_points, energy_points, attack_damage), /* FragTrap(name, hit_points, energy_points, attack_damage), ScavTrap(name, hit_points, energy_points, attack_damage), */ _name(name) { cout << *this << '\n'; }
 DiamondTrap::DiamondTrap(const DiamondTrap& other) : ClapTrap(other), FragTrap(other), ScavTrap(other), _name(other._name) { cout << "DiamondTrap(" << ::repr(other) << ")\n"; }
 
 // Copy-assignment operator (using copy-swap idiom)
