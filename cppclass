@@ -58,7 +58,7 @@ using std::ostream;
 class {{class_name}} {
 public:
 	// <generated>
-	~{{class_name}}();
+	~{{class_name}}(); // consider virtual if it's a base class
 	{{class_name}}();{{serializing_ctor_decl}}
 	{{class_name}}(const {{class_name}}&);
 	{{class_name}}& operator=({{class_name}});
@@ -90,6 +90,7 @@ using std::string;
 using std::ostream;
 using std::stringstream;
 
+// De- & Constructors
 {{class_name}}::~{{class_name}}() { cout << "~{{class_name}}()\\n"; }
 {{class_name}}::{{class_name}}(){{member_init_list}} { cout << "{{class_name}}()\\n"; }
 {{serializing_ctor}}{{class_name}}::{{class_name}}(const {{class_name}}& {{instance_other}}){{member_init_list_copy_ctor}} { cout << "{{class_name}}(" << ::repr({{instance_other}}) << ")\\n"; }
