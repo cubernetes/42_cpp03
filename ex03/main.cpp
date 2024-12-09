@@ -5,6 +5,8 @@
 #include "FragTrap.hpp"
 #include "DiamondTrap.hpp"
 
+using std::cout;
+
 int main() {
 	ScavTrap bob("Bob");
 	bob.attack("Alice");
@@ -14,7 +16,7 @@ int main() {
 	bob.beRepaired(3);
 	for (int i = 0; i < 10; ++i)
 		bob.takeDamage(15);
-	std::cout << "Bob's state: " << bob << "\n\n";
+	cout << "Bob's state: " << bob << "\n\n";
 
 	FragTrap santa("Santa");
 	santa.attack("Alice");
@@ -24,17 +26,31 @@ int main() {
 	santa.beRepaired(3);
 	for (int i = 0; i < 10; ++i)
 		santa.takeDamage(15);
-	std::cout << "Santa's state:" << santa << "\n\n";
+	cout << "Santa's state:" << santa << "\n\n";
 
 	ClapTrap weirdo("Weirdo");
 	weirdo.attack("Alice");
-	std::cout << "Weirdo's state: " << weirdo << "\n\n";
+	cout << "Weirdo's state: " << weirdo << "\n\n";
 
+	cout << "TESTING DiamondTrap string CONSTRUCTOR and whoAmI\n";
 	DiamondTrap dia("Dia");
 	dia.whoAmI();
-	ClapTrap *dia2 = new DiamondTrap("Dia2");
-	dia2->attack("something");
-	delete dia2;
-	std::cout << "Leaving scope of main\n";
+	cout << '\n';
+
+	cout << "TESTING DiamondTrap DEFAULT CONSTRUCTOR and virtual DESTRUCTORS\n";
+	ClapTrap *clappyDia = new DiamondTrap("Dia2");
+	clappyDia->attack("something");
+	cout << '\n';
+
+	cout << "TESTING CORRECT ORDER FOR DESTRUCTORS\n";
+	delete clappyDia;
+	cout << '\n';
+
+	cout << "TESTING DiamondTrap COPY-ASSIGNMENT OPERATOR\n";
+	DiamondTrap dia3;
+	dia3 = dia;
+	cout << '\n';
+
+	cout << "Leaving scope of main\n";
 	return 0;
 }
