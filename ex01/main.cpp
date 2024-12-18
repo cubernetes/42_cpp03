@@ -10,12 +10,12 @@ int main() {
 	bob.attack("Alice");
 	std::cout << "\x1b\x5b""31mTesting GUARD GATE\x1b\x5bm\n";
 	bob.guardGate();
-	std::cout << "\x1b\x5b""31mTesting TAKE DAMAGE\x1b\x5bm\n";
+	std::cout << "\x1b\x5b""31mTesting TAKE DAMAGE ScavTrap\x1b\x5bm\n";
 	for (int i = 0; i < 3; ++i)
 		bob.takeDamage(15);
-	std::cout << "\x1b\x5b""31mTesting REPARING\x1b\x5bm\n";
+	std::cout << "\x1b\x5b""31mTesting REPARING ScavTrap\x1b\x5bm\n";
 	bob.beRepaired(3);
-	std::cout << "\x1b\x5b""31mTesting TAKE DAMAGE\x1b\x5bm\n";
+	std::cout << "\x1b\x5b""31mTesting TAKE DAMAGE ScavTrap\x1b\x5bm\n";
 	for (int i = 0; i < 10; ++i)
 		bob.takeDamage(15);
 	std::cout << "\x1b\x5b""31mTesting << OVERLOAD ScavTrap\x1b\x5bm\n";
