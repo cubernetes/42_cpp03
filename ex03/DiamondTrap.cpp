@@ -36,6 +36,7 @@ string DiamondTrap::repr() const {
 	return out.str();
 }
 void DiamondTrap::swap(DiamondTrap& other) /* noexcept */ {
+	::swap(ClapTrap::_name, other.ClapTrap::_name);
 	::swap(_name, other._name);
 	::swap(_hit_points, other._hit_points);
 	::swap(_energy_points, other._energy_points);
